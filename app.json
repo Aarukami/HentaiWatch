@@ -1,0 +1,36 @@
+{
+    "name": "HentaiWatch",
+    "description": "Hentai Watch Bot",
+      "keywords": [
+      "Hentai",
+      "Bot",
+      "Telegram",
+      "Lol",
+      "Pyrogram"
+    ],
+    "repository": "https://github.com/Luska1331/HentaiWatch",
+    "env": {
+      "APIID": {
+        "description": "API ID HERE",
+        "value": ""
+      },
+      "APIHASH": {
+        "description": "API HASH HERE",
+        "value": ""
+      },
+      "TOKEN": {
+        "description": "TOKEN HERE",
+        "value": ""
+      }
+    },
+    "addons": [{
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "12"
+      }
+    }],
+    "buildpacks": [{
+      "url": "heroku/python"
+    }]
+  }
+  
