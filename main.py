@@ -148,7 +148,7 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         for tag in doujin.tag:
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
-        if m.chat.type == 'private':
+        if cq.message.chat.type == 'private':
             keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}"),("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
         else:
             keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}")]]
