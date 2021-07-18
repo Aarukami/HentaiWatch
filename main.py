@@ -150,9 +150,9 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         texto += f'\nLink: {doujin.url}'
         photo = doujin.cover
         if cq.message.chat.type == 'private':
-            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}"),("Publicar hentai", f"sendhentai|{userid}|{fname}|{nid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}|{userid}|{fname}"),("Publicar hentai", f"sendhentai|{userid}|{fname}|{nid}")]]
         else:
-            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}|{userid}|{fname}")]]
         await c.send_photo(int(chatid) ,photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
 
 @app.on_callback_query(filters.regex("sendhentai"))
