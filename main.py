@@ -1,4 +1,5 @@
 from pyrogram import Client, filters, types
+from pyrogram.types.bots_and_keyboards.inline_keyboard_button import InlineKeyboardButton
 from pyromod.helpers import ikb
 import os
 
@@ -49,7 +50,9 @@ async def on_eval_m(c: app, m: types.Message):
 
 @app.on_message(filters.regex(r'^/changelog'))
 async def changelog(c: app, m: types.Message):
-    texto = '\n-> Botão gerador de hentai foi adicionado ao <code>/nhentai</code>.\n    <code>Nota: Botão somente no modo random.</code>'
+    texto = '\n-> Foi adicionado botão para publicar hentais gerados pelo /nhentai.\n    <code>Nota: Canal onde os hentais serão postados @nHentaiWatch'
+    texto += '\n-> <code>/getnhentai</code> foi removido por causar floodwait ao bot.'
+    texto += '\n-> Botão gerador de hentai foi adicionado ao <code>/nhentai</code>.\n    <code>Nota: Botão somente no modo random.</code>'
     texto += '\n-> Canal e Grupo foram criados.'
     texto += '\n-> <code>/about</code> adicionado.'
     texto += '\n-> <code>/changelog</code> foi adicionado, uso global'
@@ -59,8 +62,7 @@ async def changelog(c: app, m: types.Message):
     
 @app.on_message(filters.regex('^/help'))
 async def command_help(c: app, m: types.Message):
-    texto = '\n<code>/getnhentai (ID)</code> -> Lhe envia as paginas do ID enviado.'
-    texto += '\n<code>/nhentai (ID)</code> -> Lhe envia a capa juntamente com informaçoes basicas do ID definido.'
+    texto = '\n<code>/nhentai (ID)</code> -> Lhe envia a capa juntamente com informaçoes basicas do ID definido.'
     texto += '\n<code>/nhentai</code> -> Lhe envia a capa juntamente com informaçoes basicas do hentai escolhido randomicamente.'
     texto += '\n<code>/changelog</code> -> Lhe envia uma lista com as ultimas mudanças no bot.'
     await m.reply(texto, parse_mode='html')
@@ -88,22 +90,29 @@ async def nhentai(c: app, m: types.Message):
     if mensagem:
         if mensagem.isdecimal():
             try:
-                from hentai import Hentai, Format, Utils
-                nid = mensagem
-                doujin = Hentai(nid)
-                texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
-                texto += f'\nTitulo: {doujin.title()}'
-                texto += f'\nID: <code>{nid}</code>'
-                texto += f'\nTags: '
-                for tag in doujin.tag:
-                    texto +=  f'{tag.name} | '
-                texto += f'\nLink: {doujin.url}'
-                photo = doujin.cover
-                await m.reply_photo(photo, caption=texto, parse_mode='HTML')
-            except:
-                await m.reply('ID invalido, tente novamente, seu corno.')
+                try:
+                    from hentai import Hentai, Format, Utils
+                    nid = mensagem
+                    doujin = Hentai(nid)
+                    texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
+                    texto += f'\nTitulo: {doujin.title()}'
+                    texto += f'\nID: <code>{nid}</code>'
+                    texto += f'\nTags: '
+                    for tag in doujin.tag:
+                        texto +=  f'{tag.name} | '
+                    texto += f'\nLink: {doujin.url}'
+                    photo = doujin.cover
+                    if m.chat.type == "private":
+                        keyboard = [[("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
+                        await m.reply_photo(photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
+                    else:
+                        await m.reply_photo(photo, caption=texto, parse_mode='HTML')
+                except BaseException as err:
+                    await m.reply(err)
+            except BaseException as err:
+                await m.reply("nID invalido, tente outro nID.")
         else:
-            await m.reply('Digita um numero, seu animal.')
+            await m.reply('Digita um numero, seu animal.') 
     else:
         from hentai import Hentai, Format, Utils
         nid = Utils.get_random_id()
@@ -115,7 +124,11 @@ async def nhentai(c: app, m: types.Message):
         for tag in doujin.tag:
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
-        keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}")]]
+        if m.chat.type == 'private':
+            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}"),("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
+        else:
+            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}")]]
+        
         photo = doujin.cover
         await m.reply_photo(photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
 
@@ -123,6 +136,8 @@ async def nhentai(c: app, m: types.Message):
 async def newhentai(c: app, cq: types.CallbackQuery):
     data, chatid = cq.data.split('|')
     if "genhentai" in data:
+        InlineText = "Espere somente alguns instantes."
+        await cq.answer(InlineText)
         from hentai import Hentai, Format, Utils
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
@@ -135,10 +150,27 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         texto += f'\nLink: {doujin.url}'
         keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}")]]
         photo = doujin.cover
-        InlineText = "Espere somente alguns instantes."
-        await cq.answer(InlineText)
         await c.send_photo(int(chatid) ,photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
 
-
+@app.on_callback_query(filters.regex("sendhentai"))
+async def sendhetani(c: Client, cq: types.CallbackQuery):
+    data, mention, nid = cq.data.split('|')
+    from hentai import Hentai
+    doujin = Hentai(nid)
+    texto = f'Enviado por {mention}'
+    texto += f'\nData de Upload: <code>{doujin.upload_date}</code>'
+    texto += f'\nTitulo: {doujin.title()}'
+    texto += f'\nID: <code>{nid}</code>'
+    texto += f'\nTags: '
+    for tag in doujin.tag:
+        texto +=  f'{tag.name} | '
+    photo = doujin.cover
+    KB = InlineKeyboardButton("nhentai.net", url=doujin.url)
+    BK = types.InlineKeyboardMarkup([[KB]])
+    nhentailink = await c.send_photo(-1001599914804, photo, texto, parse_mode="html", reply_markup=BK)
+    await c.delete_messages(cq.message.chat.id, cq.message.message_id)
+    link = f"https://t.me/nHentaiWatch/{nhentailink.message_id}"
+    SA = f"Obrigado por divulgar o hentai ao nosso canal.\nLink do post: {link}"
+    await cq.message.reply(SA, disable_web_page_preview=True)
 
 app.run()
