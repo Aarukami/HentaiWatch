@@ -125,16 +125,16 @@ async def nhentai(c: app, m: types.Message):
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
         if m.chat.type == 'private':
-            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}"),("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}"),("Publicar hentai", f"sendhentai|{m.from_user.id}|{m.from_user.first_name}|{nid}")]]
         else:
-            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}")]]
         
         photo = doujin.cover
         await m.reply_photo(photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
 
 @app.on_callback_query(filters.regex('genhentai'))
 async def newhentai(c: app, cq: types.CallbackQuery):
-    data, chatid = cq.data.split('|')
+    data, chatid, userid, fname = cq.data.split('|')
     if "genhentai" in data:
         InlineText = "Espere somente alguns instantes."
         await cq.answer(InlineText)
@@ -148,19 +148,19 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         for tag in doujin.tag:
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
+        photo = doujin.cover
         if cq.message.chat.type == 'private':
-            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}"),("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}"),("Publicar hentai", f"sendhentai|{userid}|{fname}|{nid}")]]
         else:
             keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}")]]
-        photo = doujin.cover
         await c.send_photo(int(chatid) ,photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
 
 @app.on_callback_query(filters.regex("sendhentai"))
 async def sendhetani(c: Client, cq: types.CallbackQuery):
-    data, mention, nid = cq.data.split('|')
+    data, userid, fname, nid = cq.data.split('|')
     from hentai import Hentai
     doujin = Hentai(nid)
-    texto = f'Enviado por {mention}'
+    texto = f'Enviado por <a href="tg://user?id={userid}">{fname}</a>'
     texto += f'\nData de Upload: <code>{doujin.upload_date}</code>'
     texto += f'\nTitulo: {doujin.title()}'
     texto += f'\nID: <code>{nid}</code>'
@@ -172,8 +172,7 @@ async def sendhetani(c: Client, cq: types.CallbackQuery):
     BK = types.InlineKeyboardMarkup([[KB]])
     nhentailink = await c.send_photo(-1001599914804, photo, texto, parse_mode="html", reply_markup=BK)
     await c.delete_messages(cq.message.chat.id, cq.message.message_id)
-    link = f"https://t.me/nHentaiWatch/{nhentailink.message_id}"
-    SA = f"Obrigado por divulgar o hentai ao nosso canal.\nLink do post: {link}"
+    SA = f"Obrigado por divulgar o hentai ao nosso canal.\nLink do post: https://t.me/nHentaiWatch/{nhentailink.message_id}"
     await cq.message.reply(SA, disable_web_page_preview=True)
 
 app.run()
