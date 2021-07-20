@@ -1,5 +1,5 @@
 from pyrogram import Client, filters, types
-from pyrogram.types.bots_and_keyboards.inline_keyboard_button import InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton
 from pyromod.helpers import ikb
 import os
 
@@ -25,7 +25,7 @@ async def start(c: app, m: types.Message):
 async def aboutbot(c: app, m: types.Message):
     texto = 'Informações sobre o bot:'
     texto += '\nBot criado por [Luska1331](https://t.me/Luska1331)'
-    texto += '\nRepo do bot: [HentaiWatchBot](https://github.com/Luska1331/HentaiWatchBot)'
+    texto += '\nRepo do bot: [HentaiWatch](https://github.com/Luska1331/HentaiWatch)'
     await m.reply(texto, parse_mode='md', disable_web_page_preview=True)
 
 @app.on_message(filters.regex('^/ev(al)? ') & filters.user(sudolist))
@@ -40,9 +40,7 @@ async def on_eval_m(c: app, m: types.Message):
         stdout = await meval(eval_code, globals(), **locals())
     except BaseException:
         error = traceback.format_exc()
-        await sm.edit_text(
-            f"Ocorreu um erro durante a execução do codigo:\n<code>{error}</code>"
-        )
+        await sm.edit_text(f"Ocorreu um erro durante a execução do codigo:\n<code>{error}</code>")
         return
     output_message = f"<b>Input\n&gt;</b> <code>{eval_code}</code>\n\n"
     await sm.edit_text(output_message)
@@ -103,7 +101,7 @@ async def nhentai(c: app, m: types.Message):
                     texto += f'\nLink: {doujin.url}'
                     photo = doujin.cover
                     if m.chat.type == "private":
-                        keyboard = [[("Publicar hentai", f"sendhentai|{m.from_user.mention}|{nid}")]]
+                        keyboard = [[(f"Publicar hentai", f"warnmen|{m.from_user.id}|{m.from_user.first_name}|{nid}")]]
                         await m.reply_photo(photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
                     else:
                         await m.reply_photo(photo, caption=texto, parse_mode='HTML')
@@ -125,7 +123,7 @@ async def nhentai(c: app, m: types.Message):
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
         if m.chat.type == 'private':
-            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}"),("Publicar hentai", f"sendhentai|{m.from_user.id}|{m.from_user.first_name}|{nid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}"),("Publicar hentai", f"warnmen|{m.from_user.id}|{m.from_user.first_name}|{nid}")]]
         else:
             keyboard = [[("Gerar novo hentai", f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}")]]
         
@@ -150,10 +148,21 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         texto += f'\nLink: {doujin.url}'
         photo = doujin.cover
         if cq.message.chat.type == 'private':
-            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}|{userid}|{fname}"),("Publicar hentai", f"sendhentai|{userid}|{fname}|{nid}")]]
+            keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}|{userid}|{fname}"),("Publicar hentai", f"warnmen|{userid}|{fname}|{nid}")]]
         else:
             keyboard = [[("Gerar novo hentai", f"genhentai|{chatid}|{userid}|{fname}")]]
         await c.send_photo(int(chatid) ,photo, caption=texto, parse_mode='HTML', reply_markup=ikb(keyboard))
+
+@app.on_callback_query(filters.regex("warnmen"))
+async def warnmensage(c: Client, cq: types.CallbackQuery):
+    data, userid, fname, nid = cq.data.split('|')
+    keyboard = [[("Sim", f"sendhentai|{userid}|{fname}|{nid}"),("Não", "delmenwarn")]]
+    await cq.message.reply('Deseja enviar esse hentai?', reply_markup=ikb(keyboard))
+
+@app.on_callback_query(filters.regex("delmenwarn"))
+async def delwarnmen(c: Client, cq: types.CallbackQuery):
+    await c.delete_messages(cq.message.chat.id, cq.message.message_id)
+    await c.send_message(cq.message.chat.id, "Envio cancelado.")
 
 @app.on_callback_query(filters.regex("sendhentai"))
 async def sendhetani(c: Client, cq: types.CallbackQuery):
