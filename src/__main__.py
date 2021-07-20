@@ -10,9 +10,10 @@ sudolist = [1853611480]
 
 @app.on_message(filters.regex(r'^/start'))
 async def start(c: app, m: types.Message):
-    texto = 'O HentaiWatchBot esta ativo.'
-    texto += '\nQualquer duvida olhe o /help'
-    texto += '\nFique atento as novidades do HentaiWatch:'
+    texto = 'O HentaiWatchBot esta ativo.' + \ 
+        '\nQualquer duvida olhe o /help' + \
+        '\nFique atento as novidades do HentaiWatch:'
+    
     canal = types.InlineKeyboardButton("Canal", url="https://t.me/HentaiWatchNews")
     grupo =types.InlineKeyboardButton("Grupo", url="https://t.me/HentaiWatchSupport")
     keyboard = types.InlineKeyboardMarkup([[canal, grupo]])
@@ -20,9 +21,10 @@ async def start(c: app, m: types.Message):
 
 @app.on_message(filters.regex(r'^/about'))
 async def aboutbot(c: app, m: types.Message):
-    texto = 'Informações sobre o bot:'
-    texto += '\nBot criado por [Luska1331](https://t.me/Luska1331)'
-    texto += '\nRepo do bot: [HentaiWatch](https://github.com/Luska1331/HentaiWatch)'
+    texto = 'Informações sobre o bot:' + \
+        '\nBot criado por [Luska1331](https://t.me/Luska1331)' + \
+        '\nRepo do bot: [HentaiWatch](https://github.com/Luska1331/HentaiWatch)'
+    
     await m.reply(texto, parse_mode='md', disable_web_page_preview=True)
 
 @app.on_message(filters.regex('^/ev(al)? ') & filters.user(sudolist))
@@ -42,21 +44,23 @@ async def on_eval_m(c: app, m: types.Message):
 
 @app.on_message(filters.regex(r'^/changelog'))
 async def changelog(c: app, m: types.Message):
-    texto = '\n-> Foi adicionado botão para publicar hentais gerados pelo /nhentai.\n    <code>Nota: Canal onde os hentais serão postados @nHentaiWatch'
-    texto += '\n-> <code>/getnhentai</code> foi removido por causar floodwait ao bot.'
-    texto += '\n-> Botão gerador de hentai foi adicionado ao <code>/nhentai</code>.\n    <code>Nota: Botão somente no modo random.</code>'
-    texto += '\n-> Canal e Grupo foram criados.'
-    texto += '\n-> <code>/about</code> adicionado.'
-    texto += '\n-> <code>/changelog</code> foi adicionado, uso global'
-    texto += '\n-> <code>/getnhentai</code> foi adicionado como teste, uso somente no privado.'
-    texto += '\n-> <code>/nhentai</code> foi adicionado como teste, uso global.' 
+    texto = '\n-> Foi adicionado botão para publicar hentais gerados pelo /nhentai.\n    <code>Nota: Canal onde os hentais serão postados @nHentaiWatch' +\
+        '\n-> <code>/getnhentai</code> foi removido por causar floodwait ao bot.' + \
+        '\n-> Botão gerador de hentai foi adicionado ao <code>/nhentai</code>.\n    <code>Nota: Botão somente no modo random.</code>' + \
+        '\n-> Canal e Grupo foram criados.' + \
+        '\n-> <code>/about</code> adicionado.' + \
+        '\n-> <code>/changelog</code> foi adicionado, uso global' + \
+        '\n-> <code>/getnhentai</code> foi adicionado como teste, uso somente no privado.' + \
+        '\n-> <code>/nhentai</code> foi adicionado como teste, uso global.' + \
+    
     await m.reply(texto, parse_mode='html')
     
 @app.on_message(filters.regex('^/help'))
 async def command_help(c: app, m: types.Message):
-    texto = '\n<code>/nhentai (ID)</code> -> Lhe envia a capa juntamente com informaçoes basicas do ID definido.'
-    texto += '\n<code>/nhentai</code> -> Lhe envia a capa juntamente com informaçoes basicas do hentai escolhido randomicamente.'
-    texto += '\n<code>/changelog</code> -> Lhe envia uma lista com as ultimas mudanças no bot.'
+    texto = '\n<code>/nhentai (ID)</code> -> Lhe envia a capa juntamente com informaçoes basicas do ID definido.' + \
+        '\n<code>/nhentai</code> -> Lhe envia a capa juntamente com informaçoes basicas do hentai escolhido randomicamente.' + \
+        '\n<code>/changelog</code> -> Lhe envia uma lista com as ultimas mudanças no bot.'
+    
     await m.reply(texto, parse_mode='html')
 
 @app.on_message(filters.regex(r'^/shell (?P<text>.+)'))
@@ -85,10 +89,11 @@ async def nhentai(c: app, m: types.Message):
                 try:
                     nid = mensagem
                     doujin = Hentai(nid)
-                    texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
-                    texto += f'\nTitulo: {doujin.title()}'
-                    texto += f'\nID: <code>{nid}</code>'
-                    texto += f'\nTags: '
+                    texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+                        f'\nTitulo: {doujin.title()}' + \
+                        f'\nID: <code>{nid}</code>' + \
+                        f'\nTags: '
+                    
                     for tag in doujin.tag:
                         texto +=  f'{tag.name} | '
                     texto += f'\nLink: {doujin.url}'
@@ -107,10 +112,11 @@ async def nhentai(c: app, m: types.Message):
     else:
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
-        texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
-        texto += f'\nTitulo: {doujin.title()}'
-        texto += f'\nID: <code>{nid}</code>'
-        texto += f'\nTags: '
+        texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+            f'\nTitulo: {doujin.title()}' + \
+            f'\nID: <code>{nid}</code>' + \
+            f'\nTags: '
+        
         for tag in doujin.tag:
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
@@ -130,10 +136,11 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         await cq.answer(InlineText)
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
-        texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
-        texto += f'\nTitulo: {doujin.title()}'
-        texto += f'\nID: <code>{nid}</code>'
-        texto += f'\nTags: '
+        texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+            f'\nTitulo: {doujin.title()}' + \
+            f'\nID: <code>{nid}</code>' + \
+            f'\nTags: '
+        
         for tag in doujin.tag:
             texto +=  f'{tag.name} | '
         texto += f'\nLink: {doujin.url}'
@@ -159,11 +166,11 @@ async def delwarnmen(c: Client, cq: types.CallbackQuery):
 async def sendhetani(c: Client, cq: types.CallbackQuery):
     data, userid, fname, nid = cq.data.split('|')
     doujin = Hentai(nid)
-    texto = f'Enviado por <a href="tg://user?id={userid}">{fname}</a>'
-    texto += f'\nData de Upload: <code>{doujin.upload_date}</code>'
-    texto += f'\nTitulo: {doujin.title()}'
-    texto += f'\nID: <code>{nid}</code>'
-    texto += f'\nTags: '
+    texto = f'Enviado por <a href="tg://user?id={userid}">{fname}</a>' + \
+        f'\nData de Upload: <code>{doujin.upload_date}</code>' + \
+        f'\nTitulo: {doujin.title()}' + \
+        f'\nID: <code>{nid}</code>' + \
+        f'\nTags: ' + \
     for tag in doujin.tag:
         texto +=  f'{tag.name} | '
     photo = doujin.cover
