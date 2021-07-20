@@ -51,7 +51,7 @@ async def changelog(c: app, m: types.Message):
         '\n-> <code>/about</code> adicionado.' + \
         '\n-> <code>/changelog</code> foi adicionado, uso global' + \
         '\n-> <code>/getnhentai</code> foi adicionado como teste, uso somente no privado.' + \
-        '\n-> <code>/nhentai</code> foi adicionado como teste, uso global.' + \
+        '\n-> <code>/nhentai</code> foi adicionado como teste, uso global.'
     
     await m.reply(texto, parse_mode='html')
     
