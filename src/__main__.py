@@ -10,7 +10,7 @@ sudolist = [1853611480]
 
 @app.on_message(filters.regex(r'^/start'))
 async def start(c: app, m: types.Message):
-    texto = 'O HentaiWatchBot esta ativo.' + \ 
+    texto = 'O HentaiWatchBot esta ativo.' + \
         '\nQualquer duvida olhe o /help' + \
         '\nFique atento as novidades do HentaiWatch:'
     
@@ -44,7 +44,7 @@ async def on_eval_m(c: app, m: types.Message):
 
 @app.on_message(filters.regex(r'^/changelog'))
 async def changelog(c: app, m: types.Message):
-    texto = '\n-> Foi adicionado botão para publicar hentais gerados pelo /nhentai.\n    <code>Nota: Canal onde os hentais serão postados @nHentaiWatch' +\
+    texto = '\n-> Foi adicionado botão para publicar hentais gerados pelo /nhentai.\n    <code>Nota: Canal onde os hentais serão postados @nHentaiWatch' + \
         '\n-> <code>/getnhentai</code> foi removido por causar floodwait ao bot.' + \
         '\n-> Botão gerador de hentai foi adicionado ao <code>/nhentai</code>.\n    <code>Nota: Botão somente no modo random.</code>' + \
         '\n-> Canal e Grupo foram criados.' + \
@@ -170,7 +170,7 @@ async def sendhetani(c: Client, cq: types.CallbackQuery):
         f'\nData de Upload: <code>{doujin.upload_date}</code>' + \
         f'\nTitulo: {doujin.title()}' + \
         f'\nID: <code>{nid}</code>' + \
-        f'\nTags: ' + \
+        f'\nTags: '
     for tag in doujin.tag:
         texto +=  f'{tag.name} | '
     photo = doujin.cover
