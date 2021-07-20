@@ -1,15 +1,12 @@
-from pyrogram import Client, filters, types
+from pyrogram import filters, types, Client
 from pyrogram.types import InlineKeyboardButton
+from hentai import Hentai, Utils
 from pyromod.helpers import ikb
-import os
+from meval import meval
+from .setup import app
+import traceback
 
 sudolist = [1853611480]
-
-API_ID = os.getenv('APIID')
-API_HASH = os.getenv('APIHASH')
-BOT_TOKEN = os.getenv('TOKEN')
-
-app = Client('bot', api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 @app.on_message(filters.regex(r'^/start'))
 async def start(c: app, m: types.Message):
@@ -30,9 +27,6 @@ async def aboutbot(c: app, m: types.Message):
 
 @app.on_message(filters.regex('^/ev(al)? ') & filters.user(sudolist))
 async def on_eval_m(c: app, m: types.Message):
-    import traceback
-    from meval import meval
-    import io
     command = m.text.split()[0]
     eval_code = m.text[len(command) + 1 :]
     sm = await m.reply_text("Processando...")
@@ -89,7 +83,6 @@ async def nhentai(c: app, m: types.Message):
         if mensagem.isdecimal():
             try:
                 try:
-                    from hentai import Hentai, Format, Utils
                     nid = mensagem
                     doujin = Hentai(nid)
                     texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
@@ -112,7 +105,6 @@ async def nhentai(c: app, m: types.Message):
         else:
             await m.reply('Digita um numero, seu animal.') 
     else:
-        from hentai import Hentai, Format, Utils
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
         texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
@@ -136,7 +128,6 @@ async def newhentai(c: app, cq: types.CallbackQuery):
     if "genhentai" in data:
         InlineText = "Espere somente alguns instantes."
         await cq.answer(InlineText)
-        from hentai import Hentai, Format, Utils
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
         texto = f'Data de Upload: <code>{doujin.upload_date}</code>'
@@ -167,7 +158,6 @@ async def delwarnmen(c: Client, cq: types.CallbackQuery):
 @app.on_callback_query(filters.regex("sendhentai"))
 async def sendhetani(c: Client, cq: types.CallbackQuery):
     data, userid, fname, nid = cq.data.split('|')
-    from hentai import Hentai
     doujin = Hentai(nid)
     texto = f'Enviado por <a href="tg://user?id={userid}">{fname}</a>'
     texto += f'\nData de Upload: <code>{doujin.upload_date}</code>'
