@@ -1,7 +1,9 @@
+from re import L
 from pyrogram import filters, types, Client
-from pyrogram.types import InlineKeyboardButton
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.errors import QueryIdInvalid
 from hentai import Hentai, Utils
-from pyromod.helpers import ikb
+from pyrogram.helpers import ikb
 from meval import meval
 from .setup import app
 import traceback
@@ -180,5 +182,72 @@ async def sendhetani(c: Client, cq: types.CallbackQuery):
     await c.delete_messages(cq.message.chat.id, cq.message.message_id)
     SA = f"Obrigado por divulgar o hentai ao nosso canal.\nLink do post: https://t.me/nHentaiWatch/{nhentailink.message_id}"
     await cq.message.reply(SA, disable_web_page_preview=True)
+
+from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, InlineQueryResultPhoto
+
+@app.on_inline_query()
+async def inline_help(c: app, q: InlineQuery):
+    texto = 'Informações sobre o bot:' + \
+        '\nBot criado por <a href="tg://user?id=1853611480">Luska1331</a>' + \
+        '\nRepo do bot: <a href="https://github.com/Luska1331/HentaiWatch">HentaiWatch</a>'
+    usernamebot = await c.get_me()
+    articles = [
+        InlineQueryResultArticle(
+            title="nHentai",
+            input_message_content=InputTextMessageContent(
+                f"<b>Uso:</b> <code>@{usernamebot.username} nhentai (ID)</code> - Gere um nHentai com o ID definido."
+            ),
+            description="Gere um nHentai.",
+            thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png",
+        ),InlineQueryResultArticle(
+            title="About",
+            input_message_content=InputTextMessageContent(
+                texto,
+                disable_web_page_preview=True
+            ),
+            description=f"Informaçoes do bot @{usernamebot.username}.",
+            thumb_url="https://telegra.ph/file/4f14fa97b0f6cb427e6e7.png",
+        )
+    ]
+    await q.answer(articles, cache_time=0)
+
+@app.on_inline_query(filters.regex(r"^nhentai"), group=-1)
+async def inline_help(c: app, q: InlineQuery):
+    try:
+        query = q.query.split()
+        if len(query) != 0 and query[0] == "nhentai":
+            try:
+                nsearch = " ".join(query[1:])
+                nid = nsearch
+                doujin = Hentai(nid)
+                texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+                    f'\nTitulo: {doujin.title()}' + \
+                    f'\nID: <code>{nid}</code>' + \
+                    f'\nTags: '
+                linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
+                tmp = InlineKeyboardMarkup([[linkkb]])
+                for tag in doujin.tag:
+                    texto +=  f'{tag.name} | '
+                articles = [InlineQueryResultPhoto(
+                    photo_url=doujin.cover,
+                    title=f"Titulo: {doujin.title()}",
+                    description=f"ID: {nid}",
+                    caption=texto,
+                    parse_mode="html",
+                    reply_markup=tmp
+                )]
+                await q.answer(articles, cache_time=0)
+            except TypeError:
+                pass
+            except:
+                articles = [InlineQueryResultArticle(
+                    title="ID invalido.",
+                    input_message_content=InputTextMessageContent(f"<b>ID invalido.</b>"),
+                    description="Tente novamente"                
+                    )
+                ]
+                await q.answer(articles, cache_time=0)
+    except QueryIdInvalid:
+        pass
 
 app.run()
