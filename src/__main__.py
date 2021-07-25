@@ -1,14 +1,15 @@
-from re import L
 from pyrogram import filters, types, Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import QueryIdInvalid
-from hentai import Hentai, Utils
+from hentai import Hentai, Utils, Format, Sort
 from pyrogram.helpers import ikb
 from meval import meval
 from .setup import app
 import traceback
 
+
 sudolist = [1853611480]
+
 
 @app.on_message(filters.regex(r'^/start'))
 async def start(c: app, m: types.Message):
@@ -92,7 +93,7 @@ async def nhentai(c: app, m: types.Message):
                     nid = mensagem
                     doujin = Hentai(nid)
                     texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
-                        f'\nTitulo: {doujin.title()}' + \
+                        f'\nTitulo: {doujin.title(Format.Pretty)}' + \
                         f'\nID: <code>{nid}</code>' + \
                         f'\nTags: '
                     
@@ -115,7 +116,7 @@ async def nhentai(c: app, m: types.Message):
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
         texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
-            f'\nTitulo: {doujin.title()}' + \
+            f'\nTitulo: {doujin.title(Format.Pretty)}' + \
             f'\nID: <code>{nid}</code>' + \
             f'\nTags: '
         
@@ -139,7 +140,7 @@ async def newhentai(c: app, cq: types.CallbackQuery):
         nid = Utils.get_random_id()
         doujin = Hentai(nid)
         texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
-            f'\nTitulo: {doujin.title()}' + \
+            f'\nTitulo: {doujin.title(Format.Pretty)}' + \
             f'\nID: <code>{nid}</code>' + \
             f'\nTags: '
         
@@ -170,7 +171,7 @@ async def sendhetani(c: Client, cq: types.CallbackQuery):
     doujin = Hentai(nid)
     texto = f'Enviado por <a href="tg://user?id={userid}">{fname}</a>' + \
         f'\nData de Upload: <code>{doujin.upload_date}</code>' + \
-        f'\nTitulo: {doujin.title()}' + \
+        f'\nTitulo: {doujin.title(Format.Pretty)}' + \
         f'\nID: <code>{nid}</code>' + \
         f'\nTags: '
     for tag in doujin.tag:
@@ -199,7 +200,8 @@ async def inline_help(c: app, q: InlineQuery):
             ),
             description="Gere um nHentai.",
             thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png",
-        ),InlineQueryResultArticle(
+        ),
+        InlineQueryResultArticle(
             title="About",
             input_message_content=InputTextMessageContent(
                 texto,
@@ -207,9 +209,20 @@ async def inline_help(c: app, q: InlineQuery):
             ),
             description=f"Informaçoes do bot @{usernamebot.username}.",
             thumb_url="https://telegra.ph/file/4f14fa97b0f6cb427e6e7.png",
+        ),
+        InlineQueryResultArticle(
+            title="nTag",
+            input_message_content=InputTextMessageContent(
+                f"<b>Uso:</b> <code>@{usernamebot.username} ntag (TAG)</code> - Gere a lista do 'Top Today' com hentai da tag definida."
+            ),
+            description="Gere a lista do 'Top Today' com hentai da tag definida.",
+            thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png"
         )
     ]
-    await q.answer(articles, cache_time=0)
+    try:
+        await q.answer(articles, cache_time=0)
+    except QueryIdInvalid:
+        pass
 
 @app.on_inline_query(filters.regex(r"^nhentai"), group=-1)
 async def inline_help(c: app, q: InlineQuery):
@@ -217,11 +230,40 @@ async def inline_help(c: app, q: InlineQuery):
         query = q.query.split()
         if len(query) != 0 and query[0] == "nhentai":
             try:
-                nsearch = " ".join(query[1:])
-                nid = nsearch
+                if query[1]:
+                    try:
+                        nid = " ".join(query[1:])
+                        doujin = Hentai(nid)
+                        texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+                            f'\nTitulo: {doujin.title(Format.Pretty)}' + \
+                            f'\nID: <code>{nid}</code>' + \
+                            f'\nTags: '
+                        linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
+                        tmp = InlineKeyboardMarkup([[linkkb]])
+                        for tag in doujin.tag:
+                            texto +=  f'{tag.name} | '
+                        articles = [InlineQueryResultPhoto(
+                            photo_url=doujin.cover,
+                            title=f"Titulo: {doujin.title(Format.Pretty)}",
+                            description=f"ID: {nid}",
+                            caption=texto,
+                            parse_mode="html",
+                            reply_markup=tmp
+                        )]
+                    except:
+                        articles = [InlineQueryResultArticle(
+                            title="ID invalido.",
+                            input_message_content=InputTextMessageContent(f"<b>ID invalido.</b>"),
+                            description="Tente novamente"                
+                            )
+                        ]
+            except:
+
+                #Unstable
+                nid = Utils.get_random_id()
                 doujin = Hentai(nid)
                 texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
-                    f'\nTitulo: {doujin.title()}' + \
+                    f'\nTitulo: {doujin.title(Format.Pretty)}' + \
                     f'\nID: <code>{nid}</code>' + \
                     f'\nTags: '
                 linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
@@ -230,24 +272,60 @@ async def inline_help(c: app, q: InlineQuery):
                     texto +=  f'{tag.name} | '
                 articles = [InlineQueryResultPhoto(
                     photo_url=doujin.cover,
-                    title=f"Titulo: {doujin.title()}",
+                    title=f"Titulo: {doujin.title(Format.Pretty)}",
                     description=f"ID: {nid}",
                     caption=texto,
                     parse_mode="html",
                     reply_markup=tmp
                 )]
-                await q.answer(articles, cache_time=0)
-            except TypeError:
-                pass
-            except:
-                articles = [InlineQueryResultArticle(
-                    title="ID invalido.",
-                    input_message_content=InputTextMessageContent(f"<b>ID invalido.</b>"),
-                    description="Tente novamente"                
-                    )
-                ]
-                await q.answer(articles, cache_time=0)
+            await q.answer(articles, cache_time=0)
     except QueryIdInvalid:
         pass
+    except TypeError:
+        pass
+
+
+#Unstable
+@app.on_inline_query(filters.regex('^ntag'), group=-1)
+async def inline_help(c: app, q: InlineQuery):
+    result = list()
+    query = q.query.split()
+    if len(query) != 0 and query[0] == "ntag":
+        ntag = " ".join(query[1:])
+        for doujin in Utils.search_by_query(f'tag:{ntag}', Sort.PopularToday):
+            texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+            f'\nTitulo: {doujin.title(Format.Pretty)}' + \
+            f'\nID: <code>{doujin.id}</code>' + \
+            f'\nTags: '
+            for tag in doujin.tag:
+                texto +=  f'{tag.name} | '
+            cover = doujin.cover
+            linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
+            tmp = InlineKeyboardMarkup([[linkkb]])
+            result.append(
+                InlineQueryResultPhoto(
+                    photo_url=cover,
+                    title=f'Title: {doujin.title(Format.Pretty)}',
+                    description= f"ID: {doujin.id}",
+                    caption=texto,
+                    reply_markup=tmp
+                )
+            )
+    try:
+        if len(result) > 0:
+            await q.answer(
+                results=result,
+                cache_time=0,
+            )
+        else:
+            await q.answer(
+                results=InlineQueryResultArticle(
+                    title="ERROR",
+                    input_message_content="Tag has not found")
+            )
+    except QueryIdInvalid:
+        pass
+                
+#Unstable
 
 app.run()
