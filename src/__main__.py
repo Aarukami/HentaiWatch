@@ -202,6 +202,14 @@ async def inline_help(c: app, q: InlineQuery):
             thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png",
         ),
         InlineQueryResultArticle(
+            title="nTag",
+            input_message_content=InputTextMessageContent(
+                f"<b>Uso:</b> <code>@{usernamebot.username} ntag (TAG)</code> - Gere a lista do 'Top Today' com hentai da tag definida."
+            ),
+            description="Gere a lista do 'Top Today' com hentai da tag definida.",
+            thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png"
+        ),
+        InlineQueryResultArticle(
             title="About",
             input_message_content=InputTextMessageContent(
                 texto,
@@ -209,14 +217,6 @@ async def inline_help(c: app, q: InlineQuery):
             ),
             description=f"Informaçoes do bot @{usernamebot.username}.",
             thumb_url="https://telegra.ph/file/4f14fa97b0f6cb427e6e7.png",
-        ),
-        InlineQueryResultArticle(
-            title="nTag",
-            input_message_content=InputTextMessageContent(
-                f"<b>Uso:</b> <code>@{usernamebot.username} ntag (TAG)</code> - Gere a lista do 'Top Today' com hentai da tag definida."
-            ),
-            description="Gere a lista do 'Top Today' com hentai da tag definida.",
-            thumb_url="https://telegra.ph/file/68cb8aad599ae307c28d0.png"
         )
     ]
     try:
@@ -292,37 +292,43 @@ async def inline_help(c: app, q: InlineQuery):
     query = q.query.split()
     if len(query) != 0 and query[0] == "ntag":
         ntag = " ".join(query[1:])
-        for doujin in Utils.search_by_query(f'tag:{ntag}', Sort.PopularToday):
-            texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
-            f'\nTitulo: {doujin.title(Format.Pretty)}' + \
-            f'\nID: <code>{doujin.id}</code>' + \
-            f'\nTags: '
-            for tag in doujin.tag:
-                texto +=  f'{tag.name} | '
-            cover = doujin.cover
-            linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
-            tmp = InlineKeyboardMarkup([[linkkb]])
-            result.append(
-                InlineQueryResultPhoto(
-                    photo_url=cover,
-                    title=f'Title: {doujin.title(Format.Pretty)}',
-                    description= f"ID: {doujin.id}",
-                    caption=texto,
-                    reply_markup=tmp
+        try:
+            for doujin in Utils.search_by_query(f'tag:{ntag}', Sort.PopularToday):
+                texto = f'Data de Upload: <code>{doujin.upload_date}</code>' + \
+                f'\nTitulo: {doujin.title(Format.Pretty)}' + \
+                f'\nID: <code>{doujin.id}</code>' + \
+                f'\nTags: '
+                for tag in doujin.tag:
+                    texto +=  f'{tag.name} | '
+                cover = doujin.cover
+                linkkb = InlineKeyboardButton("nhentai.net", url=doujin.url)
+                tmp = InlineKeyboardMarkup([[linkkb]])
+                result.append(
+                    InlineQueryResultPhoto(
+                        photo_url=cover,
+                        title=f'Title: {doujin.title(Format.Pretty)}',
+                        description= f"ID: {doujin.id}",
+                        caption=texto,
+                        reply_markup=tmp
+                    )
+                )
+        except:
+            result = [InlineQueryResultArticle(
+                title="Error!",
+                description="Tag not found.",
+                input_message_content=InputTextMessageContent(
+                    "<b>Tag has been not found, try again</b>"
                 )
             )
+        ]
+
     try:
         if len(result) > 0:
             await q.answer(
                 results=result,
                 cache_time=0,
             )
-        else:
-            await q.answer(
-                results=InlineQueryResultArticle(
-                    title="ERROR",
-                    input_message_content="Tag has not found")
-            )
+
     except QueryIdInvalid:
         pass
                 
