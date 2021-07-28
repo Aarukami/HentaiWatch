@@ -17,8 +17,8 @@ async def start(c: app, m: types.Message):
         '\nQualquer duvida olhe o /help' + \
         '\nFique atento as novidades do HentaiWatch:'
     
-    canal = types.InlineKeyboardButton("Canal", url="https://t.me/HentaiWatchNews")
-    grupo =types.InlineKeyboardButton("Grupo", url="https://t.me/HentaiWatchSupport")
+    canal = types.InlineKeyboardButton("Canal", url="https://t.me/nHentaiWatch")
+    grupo =types.InlineKeyboardButton("Grupo", url="https://t.me/HentaiWatchGroup")
     keyboard = types.InlineKeyboardMarkup([[canal, grupo]])
     await m.reply(texto,reply_markup=keyboard)
 
