@@ -1,0 +1,20 @@
+{
+    "start": {
+        "msg": "Ola {}, o HentaiWatch esta ativo!\nEntre no grupo de suporte:"
+    },
+    "help": {
+        "msg": "\n<code>/nhentai (ID)</code> -> Lhe envia a capa juntamente com informaçoes basicas do ID definido.\n<code>/nhentai</code> -> Lhe envia a capa juntamente com informaçoes basicas do hentai escolhido randomicamente.\n<code>/changelog</code> -> Lhe envia uma lista com as ultimas mudanças no bot."
+    },
+    "nhentai": { 
+        "msg": "Data de Upload: <code>{}</code>\nTitulo: {}\nID: <code>{}</code>\nTags: {}\nLink: {}",
+        "btnPrivate": "Publicar hentai",
+        "errornid": "ID invalido, tente outro ID.",
+        "errornumber": "Por favor, digite um numero.",
+        "btnGenhentai": "Gerar novo hentai",
+        "warnmen": "Deseja enviar o nhentai?",
+        "yes": "Sim",
+        "no": "Não",
+        "cancel": "Envio cancelado.",
+        "publish": "Obrigado por compartilhar o hentai ao canal.\nLink do post: {}"
+    }
+}
