@@ -1,7 +1,8 @@
-import meval
 import traceback
 import subprocess
 import os
+
+from meval import meval 
 
 from pyrogram import Client,filters, types
 
