@@ -7,7 +7,7 @@
         "msg": "\n<code>/nhentai (ID)</code> -> It sends you the cover page along with basic information about the defined ID.\n<code>/nhentai</code> -> He sends you the cover along with basic information about the randomly chosen hentai.\n<code>/changelog</code> -> Sends you a list of the latest bot changes."
     },
     "nhentai": { 
-        "msg": "Upload: <code>{}</code>\nTitle: {}\nID: <code>{}</code>\nTags: {}\nLink: {}",
+        "msg": "Upload: <code>{}</code>\nTitle: {}\nID: <code>{}</code>\nPages: <code>{}</code>\nTags: {}\nLink: {}",
         "btnPrivate": "Publish hentai",
         "errornid": "Invalid ID, try another ID.",
         "errornumber": "Please enter a number.",
@@ -16,7 +16,7 @@
         "yes": "Yes",
         "no": "No",
         "cancel": "Your request has been canceled.",
-        "publish": "Thanks for sharing the hentai to the channel.\nLink to the post: {}"
-
+        "publish": "Thanks for sharing the hentai to the channel.\nLink to the post: {}",
+        "telegraph": "Telegraph"
     }
 }

@@ -1,10 +1,39 @@
 from pyrogram import filters, types, Client
 from pyrogram.helpers import ikb
 from hentai import Hentai, Utils, Format
+from telegraph import Telegraph
+import requests
+import re
+
 
 from .locale import StringResources, Locale
 
 NHCHANNEL = -1001599914804
+
+def telegraph(nid):
+    
+    tmp = []
+    html_content = ''
+    url = f'https://cin.pw/v/{nid}'
+
+    resp = requests.get(url)
+
+    regex = re.findall('<img\ssrc="(.*?)"\swidth=".*?"\sheight=".*?"\s\/>', resp.text)
+    for tmp_image in regex:
+        tmp.append(tmp_image)
+
+    for img in tmp:
+        html_content += f"<img src=\"{img}\"/>\n"
+
+    doujin = Hentai(nid)
+
+    telegraph = Telegraph()
+
+    telegraph.create_account("HW", "HentaiWatch")
+
+    page = telegraph.create_page(doujin.title(Format.Pretty), html_content=html_content)
+
+    return page['url']
 
 def get_hentai(nid, langcode):
     lang = StringResources(Locale.load(langcode))
@@ -17,15 +46,16 @@ def get_hentai(nid, langcode):
             doujin.upload_date,
             doujin.title(Format.Pretty),
             nid,
+            doujin.num_pages,
             tags,
             doujin.url
             )
 
-    capt += "\n<-------->\n"
-
     photo = doujin.cover
 
-    return photo, capt
+    link = doujin.url
+
+    return photo, capt, link
 
 
 @Client.on_message(filters.command(['start']))
@@ -163,26 +193,26 @@ async def callback_send_hentai(c: Client, cq: types.CallbackQuery):
     
     lang = StringResources(Locale.load(langcode))
 
-    doujin = Hentai(nid)
+    h = get_hentai(nid, "en")
 
-    caption =   f"Enviado por <a href=\"tg://user?id={userid}\">{fname}</a>" + \
-                f"\nData de Upload: <code>{doujin.upload_date}</code>"       + \
-                f"\nTitulo: {doujin.title(Format.Pretty)}"                   + \
-                f"\nID: <code>{nid}</code>"                                  + \
-                f"\nTags: "
+    caption = f"Submitted by <a href=\"tg://user?id={userid}\">{fname}</a>\n"
 
-    caption += " | ".join([ tag.name for tag in doujin.tag ])
+    for tmp in h[1].splitlines()[:4]:
+        caption += tmp + "\n"
+    
+    photo = h[0]
+    
+    telegraph_button = types.InlineKeyboardButton("Telegraph", url=telegraph(nid))
+    nhentai_button = types.InlineKeyboardButton("nhentai.net", url=h[2])
 
-    photo = doujin.cover
-
-    keyboard_button = types.InlineKeyboardButton("nhentai.net", url=doujin.url)
-    keyboard_markup = types.InlineKeyboardMarkup([ [keyboard_button] ])
+    keyboard = types.InlineKeyboardMarkup([ [nhentai_button],
+                                            [telegraph_button] ])
 
     post = await c.send_photo(NHCHANNEL,
             photo,
             caption,
             parse_mode="html",
-            reply_markup=keyboard_markup
+            reply_markup=keyboard
             )
 
     await c.delete_messages(cq.message.chat.id, cq.message.message_id)
