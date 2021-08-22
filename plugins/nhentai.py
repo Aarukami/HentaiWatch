@@ -197,7 +197,7 @@ async def callback_send_hentai(c: Client, cq: types.CallbackQuery):
 
     caption = f"Submitted by <a href=\"tg://user?id={userid}\">{fname}</a>\n"
 
-    for tmp in h[1].splitlines()[:4]:
+    for tmp in h[1].splitlines()[:5]:
         caption += tmp + "\n"
     
     photo = h[0]
