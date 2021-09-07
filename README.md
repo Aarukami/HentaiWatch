@@ -1,4 +1,4 @@
-# HentaiWatch [Abandoned project]
+# HentaiWatch
 
 HentaiWatch is a simple Telegram Bot for all the horny otakus out there.
 
