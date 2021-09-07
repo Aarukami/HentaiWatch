@@ -10,31 +10,6 @@ from .locale import StringResources, Locale
 
 NHCHANNEL = -1001599914804
 
-def telegraph(nid):
-    
-    tmp = []
-    html_content = ''
-    url = f'https://cin.pw/v/{nid}'
-
-    resp = requests.get(url)
-
-    regex = re.findall('<img\ssrc="(.*?)"\swidth=".*?"\sheight=".*?"\s\/>', resp.text)
-    for tmp_image in regex:
-        tmp.append(tmp_image)
-
-    for img in tmp:
-        html_content += f"<img src=\"{img}\"/>\n"
-
-    doujin = Hentai(nid)
-
-    telegraph = Telegraph()
-
-    telegraph.create_account("HW", "HentaiWatch")
-
-    page = telegraph.create_page(doujin.title(Format.Pretty), html_content=html_content)
-
-    return page['url']
-
 def get_hentai(nid, langcode):
     lang = StringResources(Locale.load(langcode))
     doujin = Hentai(nid)
@@ -114,7 +89,7 @@ async def command_nhentai(c: Client, m: types.Message):
     if is_random_generated:
         keyboard_buttons[0].append(
             (lang.res['nhentai']['btnGenhentai'],
-                f"genhentai|{m.chat.id}|{m.from_user.id}|{m.from_user.first_name}|{m.from_user.language_code}|{m.chat.type}")
+                f"genhentai|{m.chat.id}|{m.from_user.language_code}")
         )
 
     if is_private_chat:
@@ -133,17 +108,19 @@ async def command_nhentai(c: Client, m: types.Message):
 
 @Client.on_callback_query(filters.regex('genhentai'))
 async def callback_newhentai(c: Client, cq: types.CallbackQuery):
-    data, chat_id, userid, fname, langcode, chattype = cq.data.split('|')
+    data, chat_id, langcode = cq.data.split('|')
     nid = Utils.get_random_id()
     lang = StringResources(Locale.load(langcode))
     h = get_hentai(nid, langcode)
     is_private_chat = False
     photo = h[0]
     caption = h[1]
+    chattype = cq.message.chat.type
+    
 
     keyboard_buttons = [
         [ (lang.res['nhentai']['btnGenhentai'],
-            f"genhentai|{chat_id}|{userid}|{fname}|{langcode}|{chattype}") ]
+            f"genhentai|{chat_id}|{langcode}") ]
     ]
 
     if chattype == "private":
@@ -152,7 +129,7 @@ async def callback_newhentai(c: Client, cq: types.CallbackQuery):
     if is_private_chat:
         keyboard_buttons[0].append(
             (lang.res['nhentai']['btnPrivate'],
-                f"warnmen|{userid}|{fname}|{nid}|{langcode}")
+                f"warnmen|{nid}|{langcode}")
         )
 
     await c.send_photo(chat_id,
@@ -165,12 +142,14 @@ async def callback_newhentai(c: Client, cq: types.CallbackQuery):
 
 @Client.on_callback_query(filters.regex("warnmen"))
 async def callback_warnmensage(c: Client, cq: types.CallbackQuery):
-    data, userid, fname, nid, langcode = cq.data.split('|')
+    data,nid, langcode = cq.data.split('|')
+    user_id = cq.from_user.id
+    user_first_name = cq.from_user.first_name
 
     lang = StringResources(Locale.load(langcode))
 
     keyboard_buttons = [
-        [ (lang.res['nhentai']['yes'], f"sendhentai|{userid}|{fname}|{nid}|{langcode}"),
+        [ (lang.res['nhentai']['yes'], f"sendhentai|{user_id}|{user_first_name}|{nid}|{langcode}"),
           (lang.res['nhentai']['no'], f"delmenwarn|{langcode}") ]
     ]
 
@@ -202,11 +181,9 @@ async def callback_send_hentai(c: Client, cq: types.CallbackQuery):
     
     photo = h[0]
     
-    telegraph_button = types.InlineKeyboardButton("Telegraph", url=telegraph(nid))
     nhentai_button = types.InlineKeyboardButton("nhentai.net", url=h[2])
 
-    keyboard = types.InlineKeyboardMarkup([ [nhentai_button],
-                                            [telegraph_button] ])
+    keyboard = types.InlineKeyboardMarkup([[nhentai_button]])
 
     post = await c.send_photo(NHCHANNEL,
             photo,
