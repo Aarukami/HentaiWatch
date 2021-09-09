@@ -1,10 +1,6 @@
 from pyrogram import Client
 from os import getenv
 
-API_ID = getenv('APIID')
-API_HASH = getenv('APIHASH')
-BOT_TOKEN = getenv('TOKEN')
+from config import API_ID,API_HASH,BOT_TOKEN,PLUGINS
 
-plugins = dict(root="plugins")
-
-Client('bot', api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN,plugins=plugins).run()
+Client('bot', api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN,plugins=PLUGINS).run()

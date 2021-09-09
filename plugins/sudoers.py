@@ -5,14 +5,15 @@ import os
 from meval import meval 
 
 from pyrogram import Client,filters, types
+from requests.models import HTTPError
 
-sudolist = [
-    1853611480,
-]
+from .utils import get_hentai,telegraphUP
 
-MAX_MESSAGE_LENGTH = 4096
+from config import SUDO_LIST,MAX_MESSAGE_LENGTH,INIT_MESSAGE_PHOTO
 
-@Client.on_message(filters.command(['sh', 'shell']) & filters.user(sudolist))
+
+
+@Client.on_message(filters.command(['sh', 'shell']) & filters.user(SUDO_LIST))
 async def command_shell(c: Client, m: types.Message):
     """
     Execute shell commands
@@ -45,7 +46,7 @@ async def command_shell(c: Client, m: types.Message):
     await m.reply(result)
 
 
-@Client.on_message(filters.command(['ev', 'eval'])  & filters.user(sudolist))
+@Client.on_message(filters.command(['ev', 'eval'])  & filters.user(SUDO_LIST))
 async def command_on_eval(c: Client, m: types.Message):
     """
     Allows user to run Python scripts
@@ -78,3 +79,25 @@ async def command_on_eval(c: Client, m: types.Message):
         await m.reply_document(result_file)
         os.remove(result_file)
         return
+
+@Client.on_message(filters.command("telegraph") & filters.user(SUDO_LIST))
+async def sudo_command_telegraph(c: Client, m: types.Message):
+    hentai_id = m.text.split()[1]
+    init_message = await m.reply_photo(photo=INIT_MESSAGE_PHOTO,
+                                        caption=f"Telegraph: nhentai.net/g/{hentai_id}"
+    )
+    try:
+        hentai_info = get_hentai(hentai_id,m.from_user.language_code)
+        telegraph_url = await telegraphUP(hentai_id)
+    except BaseException as err:
+        return await init_message.edit_text(f"ERROR: <code>{err}</code>",parse_mode="html")
+    capt = "\n".join(hentai_info[1].splitlines()[:5])
+    nhentai_button = types.InlineKeyboardButton("nhentai.net", url=hentai_info[2])
+    telegraph_button = types.InlineKeyboardButton("Telegraph",url=telegraph_url)
+    keyboard = types.InlineKeyboardMarkup([[nhentai_button,telegraph_button]])
+    Media = types.InputMediaPhoto(
+        media=hentai_info[0],
+        caption=capt,
+        parse_mode="html"
+    )
+    await init_message.edit_media(Media,keyboard)

@@ -1,0 +1,27 @@
+import os
+
+#Config - bot.py
+API_ID = os.getenv('APIID') or "Your API ID here"
+API_HASH = os.getenv('APIHASH') or "Your API HASH here"
+BOT_TOKEN = os.getenv('TOKEN') or "BOT TOKEN here"
+PLUGINS = dict(root="plugins")
+
+#Config - plugins/utils.py -> TelegraphUP()
+SHORT_NAME = "HW"
+AUTHOR_NAME = "HentaiWatch"
+AUTHOR_URL = "https://t.me/HentaiWatchBot"
+
+#Cofig - plugins/sudoers.py
+SUDO_LIST = [1853611480]
+MAX_MESSAGE_LENGTH = 4096
+
+# -> sudo_command_telegraph()
+INIT_MESSAGE_PHOTO = "https://telegra.ph/file/5efdb99994b1528f77ccf.png"
+
+#Config - plugins/nhentai.py
+LOGCHAT = -1001556213075
+NHCHANNEL = -1001599914804
+LOG_MESSAGE = "{} has been added on {}"
+
+#Config - plugins/inline.py
+INLINE_MENU_PHOTO_ICON_1 = "https://telegra.ph/file/5efdb99994b1528f77ccf.png"

@@ -17,6 +17,7 @@
         "no": "No",
         "cancel": "Your request has been canceled.",
         "publish": "Thanks for sharing the hentai to the channel.\nLink to the post: {}",
-        "telegraph": "Telegraph"
+        "telegraph": "Telegraph",
+        "MMTL": "The album/media group contains too many items."
     }
 }
