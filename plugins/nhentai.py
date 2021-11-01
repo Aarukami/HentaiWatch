@@ -8,11 +8,6 @@ from .locale import StringResources, Locale
 from config import NHCHANNEL, LOGCHAT, LOG_MESSAGE
 
 
-@Client.on_message(filters.command(['start']))
-async def command_start(c: Client, m: types.Message):
-    lang = StringResources(Locale.load(m.from_user.language_code))
-    msg = lang.res['start']['msg'].format(m.from_user.mention)
-    await m.reply(msg)
 
 
 @Client.on_message(filters.command(['help']))
