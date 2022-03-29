@@ -1,25 +1,25 @@
 import os
 
 #Config - bot.py
-API_ID = os.getenv('8153612') or "Your API ID here"
-API_HASH = os.getenv('6c9636ea928b50402b7d7c69a6eba45c') or "Your API HASH here"
-BOT_TOKEN = os.getenv('2077017001:AAHE9GF1OK2u3jRR9Ns5yZKycsQCR8HW0eY') or "BOT TOKEN here"
+API_ID = os.getenv('16409691') or "Your API ID here"
+API_HASH = os.getenv('a60b42fe202a7ffbb97043df46901227') or "Your API HASH here"
+BOT_TOKEN = os.getenv('5137140779:AAEzozrs9bOBdTYVatswZcO1zw2b6JLEpeU') or "BOT TOKEN here"
 PLUGINS = dict(root="plugins")
 
 #Config - plugins/utils.py -> TelegraphUP()
-SHORT_NAME = "HW"
-AUTHOR_NAME = "Shouko komi"
-AUTHOR_URL = "https://t.me/HentaiWatchBot"
+SHORT_NAME = "HT"
+AUTHOR_NAME = "Hemtai"
+AUTHOR_URL = "http://t.me/Fking_Hemtai_09Bot"
 
 #Cofig - plugins/sudoers.py
-SUDO_LIST = [2021224869]
+SUDO_LIST = [5053846242]
 MAX_MESSAGE_LENGTH = 4096
 
 # -> sudo_command_telegraph()
 INIT_MESSAGE_PHOTO = "https://telegra.ph/file/5efdb99994b1528f77ccf.png"
 
 #Config - plugins/nhentai.py
-LOGCHAT = -1001513602613
+LOGCHAT =  -1001747988223
 NHCHANNEL = -1001632904989
 LOG_MESSAGE = "{} has been added on {}"
 
